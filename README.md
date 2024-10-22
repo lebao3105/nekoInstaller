@@ -12,4 +12,4 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Desktop.
 * `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
   you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
 
-
+The install code that this application uses is [here.](https://github.com/lebao3105/nekoInstaller/blob/main/composeApp%2Fsrc%2FcommonMain%2Fkotlin%2Forg%2Fnekocord%2Finstaller%2FPlatform.kt)
