@@ -1,15 +1,23 @@
-# nekoInstaller
+## nekoInstaller
 
-This is a Kotlin Multiplatform project targeting Android, iOS, Desktop.
+Native, unlike Flutter whose engine does not work on non-metal Macs.
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+## Building
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+Requirements:
 
-The install code that this application uses is [here.](https://github.com/lebao3105/nekoInstaller/blob/main/composeApp%2Fsrc%2FcommonMain%2Fkotlin%2Forg%2Fnekocord%2Finstaller%2FPlatform.kt)
+* C++ 20 compiler
+* Git (of course)
+* wxWidgets 3.2 or later
+* CMake as build files generator: see supported generators [here](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html)
+
+Steps
+
+1. Clone this repository, `cd` to the cloned folder.
+
+2. Run `cmake -B build`.
+
+3. Build the project with files generated in `build`.
+
+4. Enjoy!
+
