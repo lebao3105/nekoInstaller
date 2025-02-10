@@ -7,56 +7,57 @@ using namespace wxUI;
 PrefsPageGeneralPanel::PrefsPageGeneralPanel(wxWindow* parent)
     : wxPanel(parent)
 {
+    AppSettings st = wxGetApp().GetSettings();
+
     VSizer {
+        wxSizerFlags().Expand().Border(),
         HSizer {
-            Text { "Discord branch" },
+            wxSizerFlags().Expand().Border(wxBOTTOM, 15),
 
-            discordBr = Choice { {"Stable", "PTB", "Canary"} }
+            Text {
+                wxSizerFlags().Expand(),
+                "Discord branch"
+            },
+
+            discordBr = Choice {
+                wxSizerFlags().Expand(),
+                {"Stable", "PTB", "Canary"}
+            }
+                .withSelection(st.discordBranch)
         },
 
         HSizer {
-            Text { "NekoCord branch" },
+            wxSizerFlags().Expand().Border(wxBOTTOM, 15),
 
-            nekoBr = Choice { {"Stable", "Dev", "From zip"} }
+            Text {
+                "NekoCord branch"
+            },
+
+            nekoBr = Choice {
+                {"Stable", "Dev", "From zip"}
+            }
+                .withSelection(st.nekoBranch)
         },
 
         HSizer {
+            wxSizerFlags().Expand().Border(wxBOTTOM, 15),
             Text { "Discord path" },
-            discordPath = TextCtrl {  }
-        }
+            discordPath = TextCtrl { st.discordPath }
+        },
+
+        CheckBox { "Dark Blockchain" },
+
+        CheckBox { "Install McAfee" }
     }
         .attachTo(this);
 }
 
-bool PrefsPageGeneralPanel::TransferDataToWindow()
-{
-    // AppSettings st = wxGetApp().GetSettings();
-
-    // discordPath->DiscardEdits();
-    // discordPath->AppendText(st.discordPath);
-
-    // discordBr->SetStringSelection(discordBranches[st.discordBranch]);
-    // nekoBr->SetStringSelection(nekoBranches[st.nekoBranch]);
-    return true;
-}
-
 bool PrefsPageGeneralPanel::TransferDataFromWindow()
 {
-    // AppSettings st = wxGetApp().GetSettings();
-
-    // switch (discordBr->GetSelection())
-    // {
-    //     case 0:
-    //         st.discordBranch = FINAL;
-    //         break;
-        
-    //     case 1:
-    //         st.discordBranch = PTB;
-    //         break;
-        
-    //     case 2:
-    //         st.discordBranch = CANARY;
-    // }
+    AppSettings& st = wxGetApp().GetSettings();
+    st.discordBranch = (DISCORD_BRANCH)discordBr->GetSelection();
+    st.nekoBranch = (NEKO_BRANCH)nekoBr->GetSelection();
+    st.discordBranch = discordPath->GetValue();
 
     return true;
 }
@@ -65,7 +66,7 @@ PrefsPageAboutPanel::PrefsPageAboutPanel(wxWindow* parent)
     : wxPanel(parent)
 {
     VSizer {
-        wxSizerFlags().Center(),
+        wxSizerFlags().CenterHorizontal().CenterVertical(),
         Text { "NekoCord Installer" },
         Text { "-- Unofficial --" },
         Text { "Made by Le Bao Nguyen, using wxWidgets and C++" }
@@ -88,18 +89,17 @@ PrefsPageFAQPanel::PrefsPageFAQPanel(wxWindow* parent)
             "Q: Is this safe?\n"
             "A: Yes. The source code is private due to hardcoded nekocord link. "
             "And since joining in its beta requires permission, I will just keep the source code private for now.\n"
-            "This installer only fetch the archive, backup your current Discord's app.asar, install nekocord one there, and done."
+            "This installer fetches the archive, backups your current Discord's app.asar, installs/uninstalls/updates nekocord there."
         },
 
         Text {
             wxSizerFlags().Border(wxBOTTOM, 10),
             "Q: Why this? Why C++? Why not Flutter (which the original installer uses)?\n"
             "A: Flutter dropped support for non-Metal Macs. Discord still works there.\n"
-            "As long as there is no problem about the computer being non-Metal-d, which is probably not gonna happen, "
+            "As long as there is no problem about the computer being non-Metal-d, which is probably not gonna happen,\n"
             "there is no reason to abandon this platform, especially when OpenCore Legacy Patcher and DosDude's tools exist.\n"
             "As for the programming language and GUI toolkit used: Idk why and wxWidgets is good :thumbsup~1:"
         }
-
     }
         .attachTo(this);
 }

@@ -6,7 +6,9 @@ include(GNUInstallDirs)
 include(FetchContent)
 
 find_package(wxWidgets REQUIRED COMPONENTS net core base adv)
-include(${wxWidgets_USE_FILE})
+if(wxWidgets_USE_FILE) # not defined in CONFIG mode
+	include(${wxWidgets_USE_FILE})
+endif()
 
 FetchContent_Declare(
 	wxUI
@@ -44,9 +46,8 @@ add_executable(
 )
 
 if(WIN32)
-	include(Use_wxWindows)
 	target_sources(nekoInstaller PUBLIC src/win_only.rc)
-	set_target_properties(nekoInstaller WIN32_EXECUTABLE ON)
+	set_target_properties(nekoInstaller PROPERTIES WIN32_EXECUTABLE ON)
 endif()
 
 wxUI_SetupCompilerForTarget(nekoInstaller)

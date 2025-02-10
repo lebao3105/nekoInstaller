@@ -3,7 +3,6 @@
 #include "../pch/pch.h"
 
 #include <wx/preferences.h>
-#include <wx/fileconf.h>
 #include <wxMaterialDesignArtProvider.hpp>
 
 #include <memory>
@@ -27,36 +26,15 @@ enum NEKO_BRANCH
     FROM_ZIP
 };
 
-// std::map<DISCORD_BRANCH, std::string> discordBranches
-// {
-//     std::make_pair(FINAL, "Stable"),
-//     std::make_pair(PTB, "PTB"),
-//     std::make_pair(CANARY, "Canary")
-// };
+extern std::map<DISCORD_BRANCH, std::string> discordBranches;
+extern std::map<NEKO_BRANCH, std::string> nekoBranches;
 
-// std::map<NEKO_BRANCH, std::string> nekoBranches
-// {
-//     std::make_pair(STABLE, "Stable"),
-//     std::make_pair(DEV, "Dev"),
-//     std::make_pair(FROM_ZIP, "From a zip file")
-// };
-
-class AppSettings: public wxFileConfig
+struct AppSettings
 {
-public:
-    DISCORD_BRANCH discordBranch;
-    NEKO_BRANCH nekoBranch;
+    DISCORD_BRANCH discordBranch = PTB;
+    NEKO_BRANCH nekoBranch = DEV;
 
     wxString discordPath;
-
-    explicit AppSettings()
-        : wxFileConfig("nekoInstaller", "NekoCord Team", "settings", "", wxCONFIG_USE_LOCAL_FILE)
-        {
-            EnableAutoSave();
-            // Read<DISCORD_BRANCH>("discordBranch", &discordBranch, FINAL);
-            // Read<NEKO_BRANCH>("nekoBranch", &nekoBranch, STABLE);
-            Read("discordPath", &discordPath);
-        }
 };
 
 #pragma endregion
@@ -73,7 +51,6 @@ private:
     wxUI::Choice::Proxy nekoBr;
     wxUI::TextCtrl::Proxy discordPath;
 
-    virtual bool TransferDataToWindow() override;
     virtual bool TransferDataFromWindow() override;
 };
 

@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${default}",
-                "/usr/include/wx-3.2"
+                "/usr/include/wx-3.2",
+                "${workspaceFolder}/*/_deps/wxui-src/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

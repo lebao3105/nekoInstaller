@@ -3,14 +3,21 @@
 #include "installer.h"
 #include <wxUI/wxUI.h>
 #include <wxMaterialDesignArtProvider.hpp>
+#include <wx/stdpaths.h>
+#include <wx/filefn.h>
 
 using namespace wxUI;
 
 MainWindow::MainWindow()
     : wxFrame(NULL, wxID_ANY, "NekoCord Installer")
 {
-    wxBitmap wordmark("nekocord_wordmark.png", wxBITMAP_TYPE_PNG);
-    wxBitmap logo("nekocord_logo_512.png", wxBITMAP_TYPE_PNG);
+    wxString exeDir = wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
+    wxBitmap wordmark(exeDir + "/nekocord_wordmark.png", wxBITMAP_TYPE_PNG);
+    wxBitmap logo(exeDir + "/nekocord_logo_512.png", wxBITMAP_TYPE_PNG);
+
+    bool canUninstall = wxFileExists(GetDiscordPathWithVer(wxGetApp().GetSettings().discordBranch) \
+        + wxFileName::GetPathSeparator() + "resources" \
+        + wxFileName::GetPathSeparator() + "app.asar.backup");
 
     wxUI::Button::Proxy doItBtn;
     wxUI::Button::Proxy settingsBtn;
@@ -45,24 +52,24 @@ MainWindow::MainWindow()
 
             Text { wxSizerFlags().Border(wxBOTTOM, 15), "Current Discord channel: " },
 
-            Text { wxSizerFlags().Border(wxBOTTOM, 35), wxString::Format("Current Discord path: %s", wxGetApp().GetSettings().discordPath ).utf8_string() },
+            Text { wxSizerFlags().Border(wxBOTTOM, 35), wxString::Format("Current Discord path:\n%s", wxGetApp().GetSettings().discordPath ).utf8_string() },
 
             doItBtn = Button {
-                "Install/uninstall"
+                canUninstall ? "Uninstall" : "Install / Update"
             }
-                .bind([this]() {
-                    ProgressDlg* dlg = new ProgressDlg(this);
+                .bind([this, canUninstall]() {
+                    ProgressDlg* dlg = new ProgressDlg(this, canUninstall);
                     dlg->Show(true);
                 }),
+
+            settingsBtn = Button {
+                "Settings"
+            }
+                .bind([this]() {
+                    wxGetApp().ShowPreferencesEditor(this);
+                })
         },
 
-        settingsBtn = Button {
-            wxSizerFlags().Right().Border(wxALL, 30),
-            "Settings"
-        }
-            .bind([this]() {
-                wxGetApp().ShowPreferencesEditor(this);
-            })
     }
         .attachTo(this);
     
@@ -70,4 +77,5 @@ MainWindow::MainWindow()
     settingsBtn->SetBitmap(wxMaterialDesignArtProvider::GetBitmap(wxART_SETTINGS, wxART_CLIENT_FLUENTUI_REGULAR, wxDefaultSize, wxColour(172, 210, 143)));
 
     this->SetSize(800, 680);
+    this->SetBackgroundColour(wxColour(233, 250, 230));
 }

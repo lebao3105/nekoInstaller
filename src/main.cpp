@@ -1,11 +1,26 @@
 #include "main.h"
 #include "mainwindow.h"
+#include "installer.h"
+
 #include <wx/filesys.h>
 #include <wx/fs_arc.h>
 #include <wx/artprov.h>
 #include <wxMaterialDesignArtProvider.hpp>
+#include <wx/stdpaths.h>
 
 wxIMPLEMENT_APP(nekoApp);
+
+	std::map<DISCORD_BRANCH, std::string> discordBranches = {
+		std::make_pair(FINAL, "Stable"),
+		std::make_pair(PTB, "PTB"),
+		std::make_pair(CANARY, "Canary")
+	};
+	
+	std::map<NEKO_BRANCH, std::string> nekoBranches = {
+		std::make_pair(STABLE, "Stable"),
+		std::make_pair(DEV, "Dev"),
+		std::make_pair(FROM_ZIP, "From a zip file")
+	};
 
 bool nekoApp::OnInit()
 {
@@ -20,6 +35,8 @@ bool nekoApp::OnInit()
 
 	MainWindow* wind = new MainWindow();
 	wind->Show();
+
+	settings.discordPath = GetDiscordPath(settings.discordBranch);
 	
 	return true;
 }
@@ -44,10 +61,5 @@ void nekoApp::DismissPreferencesEditor()
 
 void nekoApp::SetSettings(const AppSettings& newSettings)
 {
-	// settings = newSettings;
-	settings.discordBranch = newSettings.discordBranch;
-	// settings.Write<DISCORD_BRANCH>("discordBranch", &settings.discordBranch);
-	// settings.Write<NEKO_BRANCH>("nekoBranch", &settings.nekoBranch);
-	// settings.Write("discordPath", &settings.discordPath);
-	// settings.Save(wxFileOutputStream("settings.ini"));
+	settings = newSettings;
 }

@@ -11,3 +11,17 @@ CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
 *.geany
+*.dll
+*.a
+*.so
+*.o
+*.png
+!data/*.png
+*.exe
+*.dylib
+*.out
+nekoInstaller*
+.ninja_deps
+.ninja_log
+.ninja_lock
+build.ninja
