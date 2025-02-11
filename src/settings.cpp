@@ -36,7 +36,7 @@ PrefsPageGeneralPanel::PrefsPageGeneralPanel(wxWindow* parent)
         HSizer {
             "Discord path",
             wxSizerFlags(1).Expand().Border(wxBOTTOM, 15),
-            discordPath = TextCtrl { st.discordPath }.withStyle(wxALIGN_LEFT)
+            discordPath = TextCtrl { st.discordPath.utf8_string() }.withStyle(wxALIGN_LEFT)
         },
 
         CheckBox { "Dark Blockchain" },
