@@ -19,5 +19,7 @@ Steps
 
 3. Build the project with files generated in `build`.
 
-4. Enjoy!
+4. Copy pngs in data/ to build/.
+
+5. Enjoy!
 
