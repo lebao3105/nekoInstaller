@@ -1,13 +1,12 @@
-#include "downloader.h"
 #include "installer.h"
 #include "main.h"
 
 #include <memory>
 
-#include <wx/zipstrm.h>
 #include <wx/filefn.h>
 #include <wx/dir.h>
-#include <wx/wfstream.h>
+
+const wxString PKG_LINK = "https://nekocord.dev/uploads/nekocord/dev/423/nekocord.zip";
 
 wxString GetDiscordPath(DISCORD_BRANCH branch)
 {
@@ -71,62 +70,83 @@ wxString GetDiscordPathWithVer(DISCORD_BRANCH branch)
     return wxEmptyString;
 }
 
-ProgressDlg::ProgressDlg(wxWindow* parent, bool uninstall)
+ProgressDlg::ProgressDlg(wxWindow* parent, bool uninstall, wxString zipPath)
     : wxProgressDialog("Processing...", wxEmptyString, 100, parent,
                        wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_SMOOTH | wxPD_CAN_ABORT)
 {
-    wxString asarPath = GetDiscordPathWithVer(wxGetApp().GetSettings().discordBranch) \
-                            + wxFileName::GetPathSeparator() + "resources" \
-                            + wxFileName::GetPathSeparator() + "app.asar";
+    asarPath = GetDiscordPathWithVer(wxGetApp().GetSettings().discordBranch) \
+                + wxFileName::GetPathSeparator() + "resources" \
+                + wxFileName::GetPathSeparator() + "app.asar";
 
     if (!uninstall)
     {
-        request = wxWebSession::GetDefault().CreateRequest(this, PKG_LINK);
-
-        Bind(wxEVT_WEBREQUEST_STATE, [this, asarPath](wxWebRequestEvent& evt)
+        if (zipPath != wxEmptyString)
         {
-            switch (evt.GetState())
+            wxWebRequest request = wxWebSession::GetDefault().CreateRequest(this, PKG_LINK);
+
+            Bind(wxEVT_WEBREQUEST_STATE, [this](wxWebRequestEvent& evt)
             {
-                case wxWebRequest::State_Completed:
+                switch (evt.GetState())
                 {
-                    Pulse("Unpacking...");
-                    std::unique_ptr<wxZipEntry> entry;
-                    wxZipInputStream zip(*evt.GetResponse().GetStream());
-
-                    while (entry.reset(zip.GetNextEntry()), entry.get() != nullptr)
+                    case wxWebRequest::State_Completed:
                     {
-                        wxString name = entry->GetName();
-                        if (name == "app.asar")
+                        if (Pulse("Unpacking..."))
                         {
-                            Pulse("Installing... this is done quickly.");
-                            wxCopyFile(asarPath, asarPath + ".backup");
-                            
-                            zip.OpenEntry(*entry.get());
-
-                            wxFileOutputStream outF(asarPath);
-                            
-                            zip.Read(outF);
-                            Update(100, "Completed.");
+                            this->Hide();
+                            break;
                         }
+
+                        InstallFromStream(*evt.GetResponse().GetStream());
+                        break;
                     }
-                    break;
+
+                    case wxWebRequest::State_Failed:
+                        wxLogError("Unable to fetch!\n%s", evt.GetErrorDescription());
+                        break;
+                    
+                    // TODO
+                    default: break;
                 }
-
-                case wxWebRequest::State_Failed:
-                    wxLogError("Unable to fetch!\n%s", evt.GetErrorDescription());
-                    break;
-                
-                // TODO
-                default: break;
-            }
-        });
-        request.Start();
-        Pulse("Downloading the original installer");
+            });
+            request.Start();
+            Pulse("Downloading the original installer");
+        }
+        else {
+            wxFileInputStream stream(zipPath);
+            InstallFromStream(stream);
+        }
     }
-
     else {
         wxCopyFile(asarPath + ".backup", asarPath);
         wxRemoveFile(asarPath + ".backup");
         Update(100, "Uninstalled.");
+    }
+}
+
+void ProgressDlg::InstallFromStream(wxInputStream& stream)
+{
+    std::unique_ptr<wxZipEntry> entry;
+    wxZipInputStream zip(stream);
+
+    while (entry.reset(zip.GetNextEntry()), entry.get() != nullptr)
+    {
+        wxString name = entry->GetName();
+        if (name == "app.asar")
+        {
+            if (Pulse("Installing... this is done quickly."))
+            {
+                this->Hide();
+                break;
+            }
+            wxCopyFile(asarPath, asarPath + ".backup");
+            
+            zip.OpenEntry(*entry.get());
+
+            wxFileOutputStream outF(asarPath);
+            
+            zip.Read(outF);
+            Update(100);
+            wxMessageBox("Done.");
+        }
     }
 }

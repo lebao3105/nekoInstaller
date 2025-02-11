@@ -1,10 +1,11 @@
 #include "main.h"
 #include "mainwindow.h"
 #include "installer.h"
-#include <wxUI/wxUI.h>
+
 #include <wxMaterialDesignArtProvider.hpp>
 #include <wx/stdpaths.h>
 #include <wx/filefn.h>
+#include <wx/filedlg.h>
 
 using namespace wxUI;
 
@@ -14,6 +15,8 @@ MainWindow::MainWindow()
     wxString exeDir = wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
     wxBitmap wordmark(exeDir + "/nekocord_wordmark.png", wxBITMAP_TYPE_PNG);
     wxBitmap logo(exeDir + "/nekocord_logo_512.png", wxBITMAP_TYPE_PNG);
+    
+    AppSettings st = wxGetApp().GetSettings();
 
     bool canUninstall = wxFileExists(GetDiscordPathWithVer(wxGetApp().GetSettings().discordBranch) \
         + wxFileName::GetPathSeparator() + "resources" \
@@ -48,18 +51,39 @@ MainWindow::MainWindow()
 
         VSizer {
             wxSizerFlags().CenterHorizontal().CenterVertical(),
-            Bitmap(wxSizerFlags().Border(wxBOTTOM, 40).Border(wxTOP, 50), logo),
+            Bitmap(wxSizerFlags().Border(wxBOTTOM, 50).Border(wxTOP, 50).CenterHorizontal(), logo),
 
-            Text { wxSizerFlags().Border(wxBOTTOM, 15), "Current Discord channel: " },
+            discordBr = Text {
+                wxSizerFlags().Border(wxBOTTOM, 15)
+            },
 
-            Text { wxSizerFlags().Border(wxBOTTOM, 35), wxString::Format("Current Discord path:\n%s", wxGetApp().GetSettings().discordPath ).utf8_string() },
+            nekoBr = Text {
+                wxSizerFlags().Border(wxBOTTOM, 15)
+            },
+
+            discordPt = Text {
+                wxSizerFlags().Border(wxBOTTOM, 35)
+            },
 
             doItBtn = Button {
                 canUninstall ? "Uninstall" : "Install / Update"
             }
-                .bind([this, canUninstall]() {
-                    ProgressDlg* dlg = new ProgressDlg(this, canUninstall);
-                    dlg->Show(true);
+                .bind([this, canUninstall, st]() {
+                    if ((st.nekoBranch == FROM_ZIP) && canUninstall == false)
+                    {
+                        wxFileDialog openFileDialog(this, "Open a zip file", "", "",
+                                                    "ZIP file (*.zip)|*.zip", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+                        if (openFileDialog.ShowModal() != wxID_CANCEL)
+                        {
+                            ProgressDlg* dlg = new ProgressDlg(this, false, openFileDialog.GetPath());
+                            dlg->ShowModal();
+                        }
+                    }
+                    else
+                    {
+                        ProgressDlg* dlg = new ProgressDlg(this, canUninstall);
+                        dlg->ShowModal();
+                    }
                 }),
 
             settingsBtn = Button {
@@ -78,4 +102,13 @@ MainWindow::MainWindow()
 
     this->SetSize(800, 680);
     this->SetBackgroundColour(wxColour(233, 250, 230));
+    UpdateSettings();
+}
+
+void MainWindow::UpdateSettings()
+{
+    AppSettings st = wxGetApp().GetSettings();
+    *discordBr = wxString::Format("Current Discord channel:\n%s", discordBranches[st.discordBranch]).utf8_string();
+    *nekoBr = wxString::Format("Current NekoCord channel:\n%s", nekoBranches[st.nekoBranch]).utf8_string();
+    *discordPt = wxString::Format("Current Discord path:\n%s", st.discordPath).utf8_string();
 }

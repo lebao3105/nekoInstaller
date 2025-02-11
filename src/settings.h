@@ -33,7 +33,6 @@ struct AppSettings
 {
     DISCORD_BRANCH discordBranch = PTB;
     NEKO_BRANCH nekoBranch = DEV;
-
     wxString discordPath;
 };
 
@@ -47,8 +46,8 @@ public:
     explicit PrefsPageGeneralPanel(wxWindow* parent);
 
 private:
-    wxUI::Choice::Proxy discordBr;
-    wxUI::Choice::Proxy nekoBr;
+    wxUI::RadioBox::Proxy discordBr;
+    wxUI::RadioBox::Proxy nekoBr;
     wxUI::TextCtrl::Proxy discordPath;
 
     virtual bool TransferDataFromWindow() override;

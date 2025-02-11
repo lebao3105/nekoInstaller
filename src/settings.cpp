@@ -1,5 +1,6 @@
 #include "main.h"
 #include "settings.h"
+#include "mainwindow.h"
 #include <wxUI/wxUI.h>
 
 using namespace wxUI;
@@ -11,38 +12,31 @@ PrefsPageGeneralPanel::PrefsPageGeneralPanel(wxWindow* parent)
 
     VSizer {
         wxSizerFlags().Expand().Border(),
-        HSizer {
+
+        discordBr = RadioBox {
             wxSizerFlags().Expand().Border(wxBOTTOM, 15),
+            "Discord branch",
+            RadioBox::withChoices {},
+            {"Stable", "PTB", "Canary"}
+        }
+            .withSelection(st.discordBranch)
+            .setStyle(wxRA_SPECIFY_ROWS)
+            .withMajorDim(1),
 
-            Text {
-                wxSizerFlags().Expand(),
-                "Discord branch"
-            },
-
-            discordBr = Choice {
-                wxSizerFlags().Expand(),
-                {"Stable", "PTB", "Canary"}
-            }
-                .withSelection(st.discordBranch)
-        },
-
-        HSizer {
+        nekoBr = RadioBox {
             wxSizerFlags().Expand().Border(wxBOTTOM, 15),
-
-            Text {
-                "NekoCord branch"
-            },
-
-            nekoBr = Choice {
-                {"Stable", "Dev", "From zip"}
-            }
-                .withSelection(st.nekoBranch)
-        },
+            "NekoCord branch",
+            RadioBox::withChoices {},
+            {"Stable", "Dev", "From zip"}
+        }
+            .withSelection(st.nekoBranch)
+            .setStyle(wxRA_SPECIFY_ROWS)
+            .withMajorDim(1),
 
         HSizer {
-            wxSizerFlags().Expand().Border(wxBOTTOM, 15),
-            Text { "Discord path" },
-            discordPath = TextCtrl { st.discordPath }
+            "Discord path",
+            wxSizerFlags(1).Expand().Border(wxBOTTOM, 15),
+            discordPath = TextCtrl { st.discordPath }.withStyle(wxALIGN_LEFT)
         },
 
         CheckBox { "Dark Blockchain" },
@@ -54,10 +48,14 @@ PrefsPageGeneralPanel::PrefsPageGeneralPanel(wxWindow* parent)
 
 bool PrefsPageGeneralPanel::TransferDataFromWindow()
 {
-    AppSettings& st = wxGetApp().GetSettings();
+    AppSettings st = wxGetApp().GetSettings();
+
     st.discordBranch = (DISCORD_BRANCH)discordBr->GetSelection();
     st.nekoBranch = (NEKO_BRANCH)nekoBr->GetSelection();
-    st.discordBranch = discordPath->GetValue();
+    st.discordPath = discordPath->GetValue();
+
+    wxGetApp().SetSettings(st);
+    wxDynamicCast(wxGetApp().GetTopWindow(), MainWindow)->UpdateSettings();
 
     return true;
 }
@@ -87,7 +85,7 @@ PrefsPageFAQPanel::PrefsPageFAQPanel(wxWindow* parent)
         Text {
             wxSizerFlags().Border(wxBOTTOM, 10),
             "Q: Is this safe?\n"
-            "A: Yes. The source code is private due to hardcoded nekocord link. "
+            "A: Yes. The source code is private due to hardcoded nekocord link.\n"
             "And since joining in its beta requires permission, I will just keep the source code private for now.\n"
             "This installer fetches the archive, backups your current Discord's app.asar, installs/uninstalls/updates nekocord there."
         },

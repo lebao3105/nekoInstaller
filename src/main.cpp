@@ -10,17 +10,17 @@
 
 wxIMPLEMENT_APP(nekoApp);
 
-	std::map<DISCORD_BRANCH, std::string> discordBranches = {
-		std::make_pair(FINAL, "Stable"),
-		std::make_pair(PTB, "PTB"),
-		std::make_pair(CANARY, "Canary")
-	};
-	
-	std::map<NEKO_BRANCH, std::string> nekoBranches = {
-		std::make_pair(STABLE, "Stable"),
-		std::make_pair(DEV, "Dev"),
-		std::make_pair(FROM_ZIP, "From a zip file")
-	};
+std::map<DISCORD_BRANCH, std::string> discordBranches = {
+	std::make_pair(FINAL, "Stable"),
+	std::make_pair(PTB, "PTB"),
+	std::make_pair(CANARY, "Canary")
+};
+
+std::map<NEKO_BRANCH, std::string> nekoBranches = {
+	std::make_pair(STABLE, "Stable"),
+	std::make_pair(DEV, "Dev"),
+	std::make_pair(FROM_ZIP, "From a zip file")
+};
 
 bool nekoApp::OnInit()
 {
@@ -32,12 +32,12 @@ bool nekoApp::OnInit()
 	wxArtProvider::Push(new wxMaterialDesignArtProvider);
 
 	SetAppDisplayName("NekoCord Installer");
+	settings.discordPath = GetDiscordPath(settings.discordBranch);
 
 	MainWindow* wind = new MainWindow();
+	SetTopWindow(wind);
 	wind->Show();
 
-	settings.discordPath = GetDiscordPath(settings.discordBranch);
-	
 	return true;
 }
 
