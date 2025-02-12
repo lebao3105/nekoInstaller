@@ -32,7 +32,6 @@ bool nekoApp::OnInit()
 	wxArtProvider::Push(new wxMaterialDesignArtProvider);
 
 	SetAppDisplayName("NekoCord Installer");
-	settings.discordPath = GetDiscordPath(settings.discordBranch);
 
 	MainWindow* wind = new MainWindow();
 	SetTopWindow(wind);

@@ -31,7 +31,7 @@ extern std::map<NEKO_BRANCH, std::string> nekoBranches;
 
 struct AppSettings
 {
-    DISCORD_BRANCH discordBranch = PTB;
+    DISCORD_BRANCH discordBranch;
     NEKO_BRANCH nekoBranch = DEV;
     wxString discordPath;
 };
@@ -49,6 +49,7 @@ private:
     wxUI::RadioBox::Proxy discordBr;
     wxUI::RadioBox::Proxy nekoBr;
     wxUI::TextCtrl::Proxy discordPath;
+    wxUI::CheckBox::Proxy useCustom;
 
     virtual bool TransferDataFromWindow() override;
 };

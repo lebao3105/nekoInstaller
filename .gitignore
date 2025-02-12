@@ -25,3 +25,4 @@ nekoInstaller*
 .ninja_log
 .ninja_lock
 build.ninja
+.cmake
