@@ -17,7 +17,7 @@ PrefsPageGeneralPanel::PrefsPageGeneralPanel(wxWindow* parent)
         wxSizerFlags().Expand().Border(),
 
         discordBr = RadioBox {
-            wxSizerFlags().Expand().Border(wxBOTTOM, 15),
+            wxSizerFlags().Expand().Border(wxALL, 15),
             "Discord branch",
             RadioBox::withChoices {},
             {"Stable", "PTB", "Canary"}
@@ -27,7 +27,7 @@ PrefsPageGeneralPanel::PrefsPageGeneralPanel(wxWindow* parent)
             .withMajorDim(1),
 
         nekoBr = RadioBox {
-            wxSizerFlags().Expand().Border(wxBOTTOM, 15),
+            wxSizerFlags().Expand().Border(wxALL, 15),
             "NekoCord branch",
             RadioBox::withChoices {},
             {"Stable", "Dev", "From zip"}
@@ -37,7 +37,7 @@ PrefsPageGeneralPanel::PrefsPageGeneralPanel(wxWindow* parent)
             .withMajorDim(1),
 
         useCustom = CheckBox {
-            wxSizerFlags().Expand().Border(wxBOTTOM, 15),
+            wxSizerFlags().Expand().Border(wxALL, 15),
             "Use a custom path of Discord"
         }
             .withValue(false)
@@ -49,7 +49,7 @@ PrefsPageGeneralPanel::PrefsPageGeneralPanel(wxWindow* parent)
             "Discord path.\n"
             "Specify the folder that has a folder named 'resources'.\n"
             "You will need to also specify Discord version too if it's installed by Flatpak.",
-            wxSizerFlags(1).Expand().Border(wxBOTTOM, 15),
+            wxSizerFlags(1).Expand().Border(wxALL, 15),
             discordPath = TextCtrl {
                 st.discordPath.utf8_string()
             }
@@ -94,6 +94,7 @@ PrefsPageAboutPanel::PrefsPageAboutPanel(wxWindow* parent)
             "Made by Le Bao Nguyen, using wxWidgets and C++.\n"
             "Source code: https://github.com/lebao3105/nekoInstaller"
         }
+            .withStyle(wxALIGN_CENTER)
     }
     .attachTo(this);
 }
@@ -103,13 +104,13 @@ PrefsPageFAQPanel::PrefsPageFAQPanel(wxWindow* parent)
 {
     VSizer {
         Text {
-            wxSizerFlags().Border(wxBOTTOM, 10),
+            wxSizerFlags().Border(wxALL, 10),
             "Q: Discord got logged out!\n"
             "A: Just log back in. We've changed a file which has unmatch signature."
         },
 
         Text {
-            wxSizerFlags().Border(wxBOTTOM, 10),
+            wxSizerFlags().Border(wxALL, 10),
             "Q: Is this safe?\n"
             "A: Yes. The source code is private due to hardcoded nekocord link.\n"
             "And since joining in its beta requires permission, I will just keep the source code private for now.\n"
@@ -117,7 +118,7 @@ PrefsPageFAQPanel::PrefsPageFAQPanel(wxWindow* parent)
         },
 
         Text {
-            wxSizerFlags().Border(wxBOTTOM, 10),
+            wxSizerFlags().Border(wxALL, 10),
             "Q: Why this? Why C++? Why not Flutter (which the original installer uses)?\n"
             "A: Flutter dropped support for non-Metal Macs. Discord still works there.\n"
             "As long as there is no problem about the computer being non-Metal-d, which is probably not gonna happen,\n"
@@ -126,7 +127,7 @@ PrefsPageFAQPanel::PrefsPageFAQPanel(wxWindow* parent)
         },
 
         Text {
-            wxSizerFlags().Border(wxBOTTOM, 10),
+            wxSizerFlags().Border(wxALL, 10),
             "Q: What are these 2 last options in General page?\n"
             "A: Obviously trools. They do nothing."
         }
