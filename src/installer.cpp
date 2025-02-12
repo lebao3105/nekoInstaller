@@ -10,7 +10,13 @@ const wxString PKG_LINK = "https://nekocord.dev/uploads/nekocord/dev/423/nekocor
 
 wxString GetDiscordPath(DISCORD_BRANCH branch)
 {
+    #ifdef _WIN32
     wxString path = wxStandardPaths::Get().GetUserLocalDataDir().RemoveLast(13);
+    #else
+    #ifdef __APPLE__
+    wxString path = "/Applications/";
+    #endif
+    #endif
     
     switch (branch)
     {
@@ -26,6 +32,10 @@ wxString GetDiscordPath(DISCORD_BRANCH branch)
             path += "DiscordCanary";
             break;
     }
+
+    #ifdef __APPLE__
+    path += ".app"
+    #endif
         
     return path + wxFileName::GetPathSeparator();
 }
@@ -33,6 +43,12 @@ wxString GetDiscordPath(DISCORD_BRANCH branch)
 wxString GetDiscordPathWithVer(DISCORD_BRANCH branch)
 {
     wxString path = GetDiscordPath(branch);
+
+    #ifdef __APPLE__
+    path += "Contents"
+    return path;
+    #else
+
     wxDir dir(path);
 
     if (!dir.HasSubDirs())
@@ -66,8 +82,9 @@ wxString GetDiscordPathWithVer(DISCORD_BRANCH branch)
 
     dir.Close();
     wxMessageBox(path + ": No Discord installation found based on the selected branch", "Error", wxICON_ERROR);
-
     return wxEmptyString;
+
+    #endif
 }
 
 ProgressDlg::ProgressDlg(wxWindow* parent, bool uninstall, wxString zipPath)
