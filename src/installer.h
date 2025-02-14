@@ -9,13 +9,13 @@
 #include <wx/webrequest.h>
 #include <wx/wfstream.h>
 
-wxString GetDiscordPath(DISCORD_BRANCH branch);
-wxString GetDiscordPathWithVer(DISCORD_BRANCH branch);
+wxString GetDiscordPath(DISCORD_BRANCH branch GDP_SecondArg);
+wxString GetDiscordPathWithVer(DISCORD_BRANCH branch GDP_SecondArg);
 
 class ProgressDlg: public wxProgressDialog
 {
 public:
-    explicit ProgressDlg(wxWindow* parent, bool uninstall = false, wxString zipPath = wxEmptyString);
+    explicit ProgressDlg(wxWindow* parent, bool uninstall = false, wxString zipPath = wxEmptyString GDP_SecondArg DefaultFalse);
 
 private:
     void InstallFromStream(wxInputStream& stream);

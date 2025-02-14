@@ -5,8 +5,8 @@
 
 using namespace wxUI;
 
-extern wxString GetDiscordPath(DISCORD_BRANCH branch);
-extern wxString GetDiscordPathWithVer(DISCORD_BRANCH branch);
+extern wxString GetDiscordPath(DISCORD_BRANCH branch GDP_SecondArg);
+extern wxString GetDiscordPathWithVer(DISCORD_BRANCH branch GDP_SecondArg);
 
 PrefsPageGeneralPanel::PrefsPageGeneralPanel(wxWindow* parent)
     : wxPanel(parent)
@@ -25,6 +25,17 @@ PrefsPageGeneralPanel::PrefsPageGeneralPanel(wxWindow* parent)
             .withSelection(st.discordBranch)
             .setStyle(wxRA_SPECIFY_ROWS)
             .withMajorDim(1),
+        
+        #ifdef __linux__
+        useFlatpak = CheckBox {
+            wxSizerFlags().Expand().Border(wxALL, 15),
+            "Use Flatpak'd Discord"
+        }
+            .withValue(st.useFlatpak)
+            .bind([st, this](wxCommandEvent&) mutable {
+                st.useFlatpak = *useFlatpak;
+            }),
+        #endif
 
         nekoBr = RadioBox {
             wxSizerFlags().Expand().Border(wxALL, 15),
@@ -74,7 +85,11 @@ bool PrefsPageGeneralPanel::TransferDataFromWindow()
     if (*useCustom)
         st.discordPath = discordPath->GetValue();
     else
+    #ifndef __linux__
         st.discordPath = GetDiscordPath(st.discordBranch);
+        #else
+        st.discordPath = GetDiscordPath(st.discordBranch, st.useFlatpak);
+        #endif
 
     wxGetApp().SetSettings(st);
     wxDynamicCast(wxGetApp().GetTopWindow(), MainWindow)->UpdateSettings();

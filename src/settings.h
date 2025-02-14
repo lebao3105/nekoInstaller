@@ -34,6 +34,10 @@ struct AppSettings
     DISCORD_BRANCH discordBranch;
     NEKO_BRANCH nekoBranch = DEV;
     wxString discordPath;
+
+    #ifdef __linux__
+    bool useFlatpak = false;
+    #endif
 };
 
 #pragma endregion
@@ -50,6 +54,10 @@ private:
     wxUI::RadioBox::Proxy nekoBr;
     wxUI::TextCtrl::Proxy discordPath;
     wxUI::CheckBox::Proxy useCustom;
+
+    #ifdef __linux__
+    wxUI::CheckBox::Proxy useFlatpak;
+    #endif
 
     virtual bool TransferDataFromWindow() override;
 };

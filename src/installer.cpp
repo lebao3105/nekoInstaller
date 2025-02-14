@@ -8,7 +8,7 @@
 
 const wxString PKG_LINK = "https://nekocord.dev/uploads/nekocord/dev/423/nekocord.zip";
 
-wxString GetDiscordPath(DISCORD_BRANCH branch)
+wxString GetDiscordPath(DISCORD_BRANCH branch GDP_SecondArg)
 {
     #ifdef _WIN32
     wxString path = wxStandardPaths::Get().GetUserLocalDataDir().RemoveLast(13) + '\\';
@@ -17,7 +17,7 @@ wxString GetDiscordPath(DISCORD_BRANCH branch)
     #ifdef __APPLE__
     wxString path = "/Applications/";
     #else
-    wxString path = "/usr/share/";
+    wxString path = useFlatpak ? "/var/lib/flatpak/app/com.discordapp." :"/usr/share/";
     #endif
 
     #endif
@@ -25,15 +25,15 @@ wxString GetDiscordPath(DISCORD_BRANCH branch)
     switch (branch)
     {
         case DISCORD_BRANCH::FINAL:
-            path += wxString("Discord").Lower();
+            path += wxString("Discord")DoLowerStr;
             break;
 
         case DISCORD_BRANCH::PTB:
-            path += wxString("DiscordPTB").Lower();
+            path += wxString("DiscordPTB")DoLowerStr;
             break;
 
         case DISCORD_BRANCH::CANARY:
-            path += wxString("DiscordCanary").Lower();
+            path += wxString("DiscordCanary")DoLowerStr;
             break;
     }
 
@@ -44,9 +44,13 @@ wxString GetDiscordPath(DISCORD_BRANCH branch)
     return path + wxFileName::GetPathSeparator();
 }
 
-wxString GetDiscordPathWithVer(DISCORD_BRANCH branch)
+wxString GetDiscordPathWithVer(DISCORD_BRANCH branch GDP_SecondArg)
 {
+    #ifndef __linux__
     wxString path = GetDiscordPath(branch);
+    #else
+    wxString path = GetDiscordPath(branch, useFlatpak);
+    #endif
 
     #ifdef __APPLE__
     path += "Contents"
@@ -98,13 +102,19 @@ wxString GetDiscordPathWithVer(DISCORD_BRANCH branch)
     #endif
 }
 
-ProgressDlg::ProgressDlg(wxWindow* parent, bool uninstall, wxString zipPath)
+ProgressDlg::ProgressDlg(wxWindow* parent, bool uninstall, wxString zipPath GDP_SecondArg)
     : wxProgressDialog("Processing...", wxEmptyString, 100, parent,
                        wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_SMOOTH | wxPD_CAN_ABORT)
 {
+    #ifndef __linux__
     asarPath = GetDiscordPathWithVer(wxGetApp().GetSettings().discordBranch) \
                 + wxFileName::GetPathSeparator() + "resources" \
                 + wxFileName::GetPathSeparator() + "app.asar";
+    #else
+    asarPath = GetDiscordPathWithVer(wxGetApp().GetSettings().discordBranch, useFlatpak) \
+                + wxFileName::GetPathSeparator() + "resources" \
+                + wxFileName::GetPathSeparator() + "app.asar";
+    #endif
 
     if (!uninstall)
     {

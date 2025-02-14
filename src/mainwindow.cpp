@@ -17,8 +17,13 @@ MainWindow::MainWindow()
     wxBitmap logo(exeDir + "/nekocord_logo_512.png", wxBITMAP_TYPE_PNG);
     
     AppSettings st = wxGetApp().GetSettings();
+    #ifndef __linux__
+    #define AppendArg
+    #else
+    #define AppendArg , st.useFlatpak
+    #endif
 
-    bool canUninstall = wxFileExists(GetDiscordPathWithVer(wxGetApp().GetSettings().discordBranch) \
+    bool canUninstall = wxFileExists(GetDiscordPathWithVer(st.discordBranch AppendArg) \
         + wxFileName::GetPathSeparator() + "resources" \
         + wxFileName::GetPathSeparator() + "app.asar.backup");
 
@@ -50,7 +55,7 @@ MainWindow::MainWindow()
         },
 
         VSizer {
-            wxSizerFlags().CenterHorizontal().CenterVertical(),
+            wxSizerFlags().Center(),
             Bitmap(wxSizerFlags().Border(wxBOTTOM, 50).Border(wxTOP, 50).CenterHorizontal(), logo),
 
             discordBr = Text {
@@ -66,6 +71,7 @@ MainWindow::MainWindow()
             },
 
             doItBtn = Button {
+                wxSizerFlags().Border(wxBOTTOM, 15).CenterHorizontal(),
                 canUninstall ? "Uninstall" : "Install / Update"
             }
                 .bind([this, canUninstall, st]() {
@@ -75,13 +81,13 @@ MainWindow::MainWindow()
                                                     "ZIP file (*.zip)|*.zip", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
                         if (openFileDialog.ShowModal() != wxID_CANCEL)
                         {
-                            ProgressDlg* dlg = new ProgressDlg(this, false, openFileDialog.GetPath());
+                            ProgressDlg* dlg = new ProgressDlg(this, false, openFileDialog.GetPath() AppendArg);
                             dlg->ShowModal();
                         }
                     }
                     else
                     {
-                        ProgressDlg* dlg = new ProgressDlg(this, canUninstall);
+                        ProgressDlg* dlg = new ProgressDlg(this, canUninstall, wxEmptyString AppendArg);
                         dlg->ShowModal();
                     }
                 }),
